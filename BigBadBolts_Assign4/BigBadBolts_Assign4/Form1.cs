@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace BigBadBolts_Assign4
 {
-    public partial class Form1 : Form
+    public partial class Reddit : Form
     {
-        public Form1()
+        public Reddit()
         {
             InitializeComponent();
         }

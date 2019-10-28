@@ -46,14 +46,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assign2_ref\Comment.cs" />
+    <Compile Include="Assign3_ref\Comment.cs" />
+    <Compile Include="Assign3_ref\HelperFunctions.cs" />
+    <Compile Include="Assign3_ref\Post.cs" />
+    <Compile Include="Assign3_ref\RedditQueries.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Assign3_ref\RedditQueries.Designer.cs" />
+    <Compile Include="Assign3_ref\Subreddit.cs" />
+    <Compile Include="Assign3_ref\User.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Assign2_ref\HelperFunctions.cs" />
+    <Compile Include="Assign2_ref\Post.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Assign2_ref\RedditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Assign2_ref\RedditForm.Designer.cs" />
+    <Compile Include="Assign2_ref\Subreddit.cs" />
+    <Compile Include="Assign2_ref\User.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
