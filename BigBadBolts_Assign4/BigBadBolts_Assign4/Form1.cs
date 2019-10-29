@@ -24,60 +24,18 @@ namespace BigBadBolts_Assign4
             HelperFunctions.getFileInput();
             foreach (Post p in myPosts)
             {
-                Label label = new Label();
-                label.BorderStyle = BorderStyle.FixedSingle;
-                int count = mainPanel.Controls.OfType<Label>().ToList().Count;
-                label.Location = new System.Drawing.Point(10, 70 * count);
-                label.AutoSize = true;
-                label.Name = "txt_" + (count + 1);
-                string postText = p.ToString();
-                int newlineSpot = 0;
-                bool skip =true;
-                for (int i = 0; i < postText.Length; ++i)
-                {
-                    if (i % 100 == 0)
-                    {
-                        if (!skip)
-                        {
-                            try
-                            {
-                                while (postText[i + newlineSpot] != ' ' && i + newlineSpot < postText.Length - 1)
-                                {
-                                    newlineSpot++;
-                                    if (i + newlineSpot > postText.Length - 3)
-                                    {
-                                        newlineSpot = 0;
-                                        break;
-                                    }
-                                }
-                            }
-                            catch (IndexOutOfRangeException ex)
-                            {
+                RichTextBox rtb = new RichTextBox();
+           
+                int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+                rtb.Location = new System.Drawing.Point(10, 70 * count);
+                rtb.Size = new Size(935,50);
+                rtb.Name = "txt_" + (count + 1);
 
-                            }
-                            if ((i + newlineSpot) > postText.Length - 1)
-                                newlineSpot = 0;
-                            i += newlineSpot;
-                            StringBuilder sb = new StringBuilder(postText);
-                            sb[i] = '\n';
-                            postText = sb.ToString();
-                        }
-                        else
-                        {
-                            skip = !skip;
-                        }
-                    }
-                }
-                label.Text = postText;
-               // string line = "---------------------------------------------------";
-               // label.Text += "\n" + "\n" + line + "\n";
-                mainPanel.Controls.Add(label);
+                rtb.Text = p.ToString();
 
-                //Label newLabel = new Label();
-                //newLabel.Text = p.ToString();
-                //newLabel.Parent = mainPanel;
-                //mainPanel.Controls.Add(newLabel);
-                //mainPanel.Container.Add(p);
+                mainPanel.Controls.Add(rtb);
+
+        
             }
         }
 
