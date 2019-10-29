@@ -69,25 +69,9 @@ namespace BigBadBolts_Assign4
             }
             else //This is to log out
             {
+                ////Reset everything to a logged out state
                 loginBtn.Text = "Login";
                 currentUser = null;
-                ////Reset everything to a logged out state
-                //systemOutListBox.Items.Add("Goodbye " + userListBox.SelectedItem);
-                //currentUserID = null;
-                //superuser = false;
-                //moderator = false;
-                //lockPostBtn.Visible = false;
-                //userListBox.Enabled = true;
-                //login.Text = "Login";
-                //postListBox.Items.Clear();
-                //commentListBox.Items.Clear();
-                //addReplyBtn.Enabled = false;
-                //addReplyTextBox.Text = "";
-                //addReplyTextBox.Enabled = false;
-                //ToggleSubLabels(false);
-                //subredditListBox.ClearSelected();
-                //deleteCommentBtn.Enabled = false;
-                //deletePostBtn.Enabled = false;
             }
         }
     }
