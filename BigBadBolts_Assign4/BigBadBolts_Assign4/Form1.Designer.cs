@@ -35,10 +35,10 @@
             // loginBtn
             // 
             this.loginBtn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.loginBtn.Location = new System.Drawing.Point(891, 38);
+            this.loginBtn.Location = new System.Drawing.Point(825, 40);
             this.loginBtn.Margin = new System.Windows.Forms.Padding(4);
             this.loginBtn.Name = "loginBtn";
-            this.loginBtn.Size = new System.Drawing.Size(100, 28);
+            this.loginBtn.Size = new System.Drawing.Size(149, 28);
             this.loginBtn.TabIndex = 0;
             this.loginBtn.Text = "Login";
             this.loginBtn.UseVisualStyleBackColor = true;

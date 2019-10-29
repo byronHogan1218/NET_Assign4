@@ -16,6 +16,8 @@ namespace BigBadBolts_Assign4
         static public SortedSet<Comment> myComments = new SortedSet<Comment>();
         static public SortedSet<Subreddit> mySubReddits = new SortedSet<Subreddit>();
         static public SortedSet<User> myUsers = new SortedSet<User>();
+        static public User currentUser = null;
+
         public Reddit()
         {
             InitializeComponent();
@@ -93,108 +95,24 @@ namespace BigBadBolts_Assign4
             {
                 Form2 f = new Form2();
                 var result = f.ShowDialog();
-                if (result == DialogResult.OK)
+                if (result == DialogResult.Cancel)//we did not log in
                 {
-                    User currentUser = f.loggedInUser;            //values preserved after close
-                    //Do something here with these values
+                    //do nothing
+                    return;
+                }
+                if (result == DialogResult.OK) //We succesfully logged in
+                {
+                    currentUser = f.loggedInUser; //Get the user from the login form
+                    login.AutoSize = true;
+                    login.Text = "Logout from " + currentUser.Name;
 
                 }
-                //foreach (User user in myUsers)
-                //{
-                //    //Get rid of any extra info in the name
-                //    string curUser = (string)userListBox.SelectedItem;
-                //    curUser = curUser.Split(' ')[0];
-                //    if ((string)userListBox.SelectedItem == user.Name || curUser == user.Name)//found the user we are trying to log in as
-                //    {
-                //        //converts the selected user name to a string
-                //        string selectedName = userListBox.SelectedItem.ToString();
-                //        selectedName = selectedName.Split(' ')[0];
-
-                //        bool loginSuccess = false; //used to prompt password is correct or not
-
-                //        string hashCode = user.PasswordHash.ToString(); //the hashpassword from the user.txt file
-                //        string inputPassword = passwordTextBox.Text.GetHashCode().ToString("X"); //the hash password that the user inputs
-
-                //        if (hashCode == inputPassword)
-                //        {
-                //            loginSuccess = true;
-                //        }
-
-                //        if (hashCode != inputPassword)
-                //        {
-                //            loginSuccess = false;
-                //        }
-
-                //        if (loginSuccess) //if the password was correct, log in
-                //        {
-                //            if (user.Type == 2)//Super user, must implement enumeration on this
-                //            {
-                //                superuser = true;
-                //            }
-                //            if (user.Type == 1)//Moderator, must implement enumeration on this
-                //            {
-                //                moderator = true;
-                //            }
-
-                //            currentUserID = user.Id;
-                //            //Load the things written by the logged in user
-                //            postListBox.Items.Clear();
-                //            commentListBox.Items.Clear();
-                //            foreach (Post userPost in myPosts)
-                //            {
-                //                if (userPost.PostAuthorId == currentUserID)
-                //                {
-                //                    postListBox.Items.Add(userPost.ToString());
-                //                }
-
-                //            }
-                //            if (postListBox.Items.Count == 0)
-                //            {
-                //                postListBox.Items.Add("There are no posts by this user.");
-                //                postListBox.Enabled = false;
-                //            }
-                //            else
-                //            {
-                //                postListBox.Enabled = true;
-                //            }
-                //            foreach (Comment userComment in myComments)
-                //            {
-                //                if (userComment.CommentAuthorId == currentUserID)
-                //                {
-                //                    commentListBox.Items.Add(userComment.ToString());
-                //                }
-                //            }
-                //            if (commentListBox.Items.Count == 0)
-                //            {
-                //                commentListBox.Items.Add("There are no comments by this user.");
-                //                commentListBox.Enabled = false;
-                //            }
-                //            else
-                //            {
-                //                commentListBox.Enabled = true;
-                //            }
-                //            //Done loading things written by the user
-
-                //            systemOutListBox.Items.Add("We are logged in as user: " + userListBox.SelectedItem);
-                //            systemOutListBox.Items.Add("Getting all posts and comments by " + userListBox.SelectedItem);
-                //            login.Text = "Logout";
-                //            userListBox.Enabled = false;
-                //        }
-
-                //        if (!loginSuccess) //login not a success, prompt to try again
-                //        {
-                //            systemOutListBox.Items.Add("The password is not right, please try again.");
-                //            userListBox.Enabled = true;
-                //        }
-
-                //        passwordTextBox.Text = String.Empty; //clears the password textbox
-                //        break;
-                //    }
-                //}
+     
             }
             else //This is to log out
             {
                 loginBtn.Text = "Login";
+                currentUser = null;
                 ////Reset everything to a logged out state
                 //systemOutListBox.Items.Add("Goodbye " + userListBox.SelectedItem);
                 //currentUserID = null;
@@ -214,6 +132,5 @@ namespace BigBadBolts_Assign4
                 //deletePostBtn.Enabled = false;
             }
         }
-        //test
     }
 }
