@@ -16,6 +16,8 @@ namespace BigBadBolts_Assign4
         static public SortedSet<Comment> myComments = new SortedSet<Comment>();
         static public SortedSet<Subreddit> mySubReddits = new SortedSet<Subreddit>();
         static public SortedSet<User> myUsers = new SortedSet<User>();
+        static public User currentUser = null;
+
         public Reddit()
         {
             InitializeComponent();
@@ -83,6 +85,52 @@ namespace BigBadBolts_Assign4
         {
 
         }
-//test
+
+        private void LoginBtn_Click(object sender, EventArgs e)
+        {
+
+            Button login = sender as Button;
+
+            if (login.Text == "Login") //this is to login
+            {
+                Form2 f = new Form2();
+                var result = f.ShowDialog();
+                if (result == DialogResult.Cancel)//we did not log in
+                {
+                    //do nothing
+                    return;
+                }
+                if (result == DialogResult.OK) //We succesfully logged in
+                {
+                    currentUser = f.loggedInUser; //Get the user from the login form
+                    login.AutoSize = true;
+                    login.Text = "Logout from " + currentUser.Name;
+
+                }
+     
+            }
+            else //This is to log out
+            {
+                loginBtn.Text = "Login";
+                currentUser = null;
+                ////Reset everything to a logged out state
+                //systemOutListBox.Items.Add("Goodbye " + userListBox.SelectedItem);
+                //currentUserID = null;
+                //superuser = false;
+                //moderator = false;
+                //lockPostBtn.Visible = false;
+                //userListBox.Enabled = true;
+                //login.Text = "Login";
+                //postListBox.Items.Clear();
+                //commentListBox.Items.Clear();
+                //addReplyBtn.Enabled = false;
+                //addReplyTextBox.Text = "";
+                //addReplyTextBox.Enabled = false;
+                //ToggleSubLabels(false);
+                //subredditListBox.ClearSelected();
+                //deleteCommentBtn.Enabled = false;
+                //deletePostBtn.Enabled = false;
+            }
+        }
     }
 }
