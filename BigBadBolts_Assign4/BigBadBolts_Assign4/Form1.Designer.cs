@@ -28,20 +28,52 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.loginBtn = new System.Windows.Forms.Button();
+            this.mainPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
+            // 
+            // loginBtn
+            // 
+            this.loginBtn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.loginBtn.Location = new System.Drawing.Point(891, 38);
+            this.loginBtn.Margin = new System.Windows.Forms.Padding(4);
+            this.loginBtn.Name = "loginBtn";
+            this.loginBtn.Size = new System.Drawing.Size(100, 28);
+            this.loginBtn.TabIndex = 0;
+            this.loginBtn.Text = "Login";
+            this.loginBtn.UseVisualStyleBackColor = true;
+            // 
+            // mainPanel
+            // 
+            this.mainPanel.AutoScroll = true;
+            this.mainPanel.Location = new System.Drawing.Point(24, 97);
+            this.mainPanel.Margin = new System.Windows.Forms.Padding(4);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(999, 432);
+            this.mainPanel.TabIndex = 1;
             // 
             // Reddit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.mainPanel);
+            this.Controls.Add(this.loginBtn);
+            this.Font = new System.Drawing.Font("Source Code Pro", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Reddit";
-            this.Text = "Form1";
+            this.Text = "Reddit";
+            this.Load += new System.EventHandler(this.Reddit_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Button loginBtn;
+        private System.Windows.Forms.Panel mainPanel;
     }
 }
 
