@@ -56,10 +56,6 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-<<<<<<< HEAD
-            this.ClientSize = new System.Drawing.Size(1067, 554);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-=======
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(1067, 554);
             this.Controls.Add(this.mainPanel);
@@ -67,7 +63,6 @@
             this.Font = new System.Drawing.Font("Source Code Pro", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.Margin = new System.Windows.Forms.Padding(4);
->>>>>>> 0792b228a61cb06a05ff2b34fb0153bdb2e0ee7b
             this.Name = "Reddit";
             this.Text = "Reddit";
             this.Load += new System.EventHandler(this.Reddit_Load);
