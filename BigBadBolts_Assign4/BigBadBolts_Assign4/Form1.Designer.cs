@@ -40,7 +40,7 @@
             // loginBtn
             // 
             this.loginBtn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.loginBtn.Location = new System.Drawing.Point(825, 40);
+            this.loginBtn.Location = new System.Drawing.Point(825, 32);
             this.loginBtn.Margin = new System.Windows.Forms.Padding(4);
             this.loginBtn.Name = "loginBtn";
             this.loginBtn.Size = new System.Drawing.Size(149, 28);
@@ -74,6 +74,7 @@
             this.SubbredditComboBox.Name = "SubbredditComboBox";
             this.SubbredditComboBox.Size = new System.Drawing.Size(220, 24);
             this.SubbredditComboBox.TabIndex = 3;
+            this.SubbredditComboBox.SelectedIndexChanged += new System.EventHandler(this.SubbredditComboBox_SelectedIndexChanged);
             // 
             // label1
             // 
