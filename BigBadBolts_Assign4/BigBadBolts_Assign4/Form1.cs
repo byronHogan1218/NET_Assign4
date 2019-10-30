@@ -29,7 +29,7 @@ namespace BigBadBolts_Assign4
 
         private void PopulateSubComboBox()
         {
-            SubbredditComboBox.Items.Add("All Subbreddits");
+            SubbredditComboBox.Items.Add("Home");
             foreach(Subreddit subreddit in mySubReddits)
             {
                 if(subreddit.Name != "all")
@@ -42,6 +42,33 @@ namespace BigBadBolts_Assign4
             mainPanel.Controls.Clear();
         }
 
+        private string TimeFrameAgo(DateTime obj)
+        {
+            //            Less than an hour old from NOW, in which we're measuring minutes since posting
+            //              Less than a day from NOW, in which we're measuring hours since posting
+            //              Less than a month from NOW, in which we're measuring days since posting
+            //              Less than a year from NOW, in which we're measuring months since posting
+            //              More than a year from NOW, in which we're measuring years since posting
+
+            int daysSincePost = 0;
+            if (DateTime.Now.Month + 1 == obj.Month || DateTime.Now.Month == 12 && obj.Month == 1)
+                daysSincePost = DateTime.Now.Day + 30 - obj.Day;
+            else
+                daysSincePost = DateTime.Now.Day - obj.Day;
+            if (DateTime.Now.Hour - obj.Hour < 1)//posted less than an hour ago
+            {
+                return (DateTime.Now.Minute - obj.Minute).ToString();
+            }
+            else if (DateTime.Now.Hour - obj.Hour < 24)//posted less than a day ago
+            {
+                return (DateTime.Now.Hour - obj.Hour).ToString();
+            }
+            else if (daysSincePost < 30)//posted less than a month
+            {
+                return (DateTime.Now.Minute - obj.Minute).ToString();
+            }
+        }
+
         private void LoadPosts(string subredditName)
         {
             ClearPanel();
@@ -49,14 +76,56 @@ namespace BigBadBolts_Assign4
             {
                 foreach (Post p in myPosts)
                 {
+                    PictureBox upVote = new PictureBox();
+                    PictureBox downVote = new PictureBox();
+                    Label scoreLabel = new Label();
                     RichTextBox rtb = new RichTextBox();
 
                     int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                    rtb.Location = new System.Drawing.Point(10, 70 * count);
-                    rtb.Size = new Size(935, 50);
+
+                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                    upVote.Width = 23;
+                    upVote.Height = 23;
+                    mainPanel.Controls.Add(upVote);
+
+                    scoreLabel.Text = p.Score.ToString();
+                    scoreLabel.Location = new System.Drawing.Point(2, (70 * count) + 25);
+                    scoreLabel.AutoSize = true;
+                    mainPanel.Controls.Add(scoreLabel);
+
+                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                    downVote.Width = 23;
+                    downVote.Height = 23;
+                    mainPanel.Controls.Add(downVote);
+
+                    rtb.Location = new System.Drawing.Point(50, 70 * count);
+                    rtb.Size = new Size(920, 60);
                     rtb.Name = "txt_" + (count + 1);
 
-                    rtb.Text = p.ToString();
+                    //r / SUBREDDIT_HOME | Posted by u/ AUTHOR_NAME TIME_FRAME ago
+                    rtb.Text = "r/";
+                    foreach(Subreddit sub in mySubReddits)
+                    {
+                        if(p.SubHome == sub.Id)
+                        {
+                            rtb.Text += sub.Name;
+                            break;
+                        }
+                    }
+                    rtb.Text += " | Posted by u/";
+                    foreach (User user in myUsers)
+                    {
+                        if (p.PostAuthorId == user.Id)
+                        {
+                            rtb.Text += user.Name;
+                            break;
+                        }
+                    }
+                    rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
+
+                    rtb.Text = p.PostContent;
 
                     mainPanel.Controls.Add(rtb);
 
