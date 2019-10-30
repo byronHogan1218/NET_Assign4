@@ -22,20 +22,44 @@ namespace BigBadBolts_Assign4
         {
             InitializeComponent();
             HelperFunctions.getFileInput();
-            foreach (Post p in myPosts)
+            LoadPosts("all");
+            PopulateSubComboBox();
+            SubbredditComboBox.SelectedIndex = 0;
+        }
+
+        private void PopulateSubComboBox()
+        {
+            SubbredditComboBox.Items.Add("All Subbreddits");
+            foreach(Subreddit subreddit in mySubReddits)
             {
-                RichTextBox rtb = new RichTextBox();
-           
-                int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                rtb.Location = new System.Drawing.Point(10, 70 * count);
-                rtb.Size = new Size(935,50);
-                rtb.Name = "txt_" + (count + 1);
+                if(subreddit.Name != "all")
+                  SubbredditComboBox.Items.Add(subreddit.Name);
+            }
+        }
 
-                rtb.Text = p.ToString();
+        private void LoadPosts(string subredditName)
+        {
+            if(subredditName == "all") // load all the posts
+            {
+                foreach (Post p in myPosts)
+                {
+                    RichTextBox rtb = new RichTextBox();
 
-                mainPanel.Controls.Add(rtb);
+                    int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+                    rtb.Location = new System.Drawing.Point(10, 70 * count);
+                    rtb.Size = new Size(935, 50);
+                    rtb.Name = "txt_" + (count + 1);
 
-        
+                    rtb.Text = p.ToString();
+
+                    mainPanel.Controls.Add(rtb);
+
+
+                }
+            }
+            else //load selected subreddits posts
+            {
+
             }
         }
 
