@@ -37,8 +37,14 @@ namespace BigBadBolts_Assign4
             }
         }
 
+        private void ClearPanel()
+        {
+            mainPanel.Controls.Clear();
+        }
+
         private void LoadPosts(string subredditName)
         {
+            ClearPanel();
             if(subredditName == "all") // load all the posts
             {
                 foreach (Post p in myPosts)
@@ -59,7 +65,51 @@ namespace BigBadBolts_Assign4
             }
             else //load selected subreddits posts
             {
+                Subreddit selectedSub = null;
+                foreach(Subreddit sub in mySubReddits) //search for slected subreddit
+                {
+                    if(sub.Name == subredditName)//found the subreddit
+                    {
+                        selectedSub = sub;
+                        break;
+                    }
+                }
 
+                bool empty = true;
+                foreach (Post p in myPosts)
+                {
+                    if (p.SubHome == selectedSub.Id)
+                    {
+                        if(empty == true)
+                        {
+                            empty = false;
+                        }
+                        RichTextBox rtb = new RichTextBox();
+
+                        int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+                        rtb.Location = new System.Drawing.Point(10, 70 * count);
+                        rtb.Size = new Size(935, 50);
+                        rtb.Name = "txt_" + (count + 1);
+
+                        rtb.Text = p.ToString();
+
+                        mainPanel.Controls.Add(rtb);
+
+                    }
+                }
+                if(empty == true)
+                {
+                    RichTextBox rtb = new RichTextBox();
+
+                    int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+                    rtb.Location = new System.Drawing.Point(10, 70 * count);
+                    rtb.Size = new Size(935, 50);
+                    rtb.Name = "txt_" + (count + 1);
+
+                    rtb.Text = "There are no posts to load.";
+
+                    mainPanel.Controls.Add(rtb);
+                }
             }
         }
 
@@ -96,6 +146,18 @@ namespace BigBadBolts_Assign4
                 ////Reset everything to a logged out state
                 loginBtn.Text = "Login";
                 currentUser = null;
+            }
+        }
+
+        private void SubbredditComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(SubbredditComboBox.SelectedIndex == 0)//this is all
+            {
+                LoadPosts("all");
+            }
+            else //load the individual subbreddits
+            {
+                LoadPosts(SubbredditComboBox.SelectedItem.ToString());
             }
         }
     }
