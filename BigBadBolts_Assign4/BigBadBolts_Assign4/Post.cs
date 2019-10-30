@@ -238,7 +238,7 @@ namespace BigBadBolts_Assign4
 
             if (rightOp != null)
             {
-                return PostRating.CompareTo(rightOp.PostRating); //This might have to be switched around
+                return rightOp.PostRating.CompareTo(PostRating); //This might have to be switched around
             }
             else
             {

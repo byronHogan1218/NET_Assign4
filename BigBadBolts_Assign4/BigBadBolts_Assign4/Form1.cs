@@ -29,7 +29,7 @@ namespace BigBadBolts_Assign4
 
         private void PopulateSubComboBox()
         {
-            SubbredditComboBox.Items.Add("All Subbreddits");
+            SubbredditComboBox.Items.Add("Home");
             foreach(Subreddit subreddit in mySubReddits)
             {
                 if(subreddit.Name != "all")
@@ -49,13 +49,33 @@ namespace BigBadBolts_Assign4
             {
                 foreach (Post p in myPosts)
                 {
+                    PictureBox upVote = new PictureBox();
+                    PictureBox downVote = new PictureBox();
+                    Label scoreLabel = new Label();
                     RichTextBox rtb = new RichTextBox();
 
                     int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                    rtb.Location = new System.Drawing.Point(10, 70 * count);
-                    rtb.Size = new Size(935, 50);
-                    rtb.Name = "txt_" + (count + 1);
 
+                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                    upVote.Width = 23;
+                    upVote.Height = 23;
+                    mainPanel.Controls.Add(upVote);
+
+                    scoreLabel.Text = p.Score.ToString();
+                    scoreLabel.Location = new System.Drawing.Point(2, (70 * count) + 25);
+                    scoreLabel.AutoSize = true;
+                    mainPanel.Controls.Add(scoreLabel);
+
+                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                    downVote.Width = 23;
+                    downVote.Height = 23;
+                    mainPanel.Controls.Add(downVote);
+
+                    rtb.Location = new System.Drawing.Point(50, 70 * count);
+                    rtb.Size = new Size(920, 60);
+                    rtb.Name = "txt_" + (count + 1);
                     rtb.Text = p.ToString();
 
                     mainPanel.Controls.Add(rtb);
