@@ -18,6 +18,8 @@ namespace BigBadBolts_Assign4
         static public SortedSet<Subreddit> mySubReddits = new SortedSet<Subreddit>();
         static public SortedSet<User> myUsers = new SortedSet<User>();
         static public User currentUser = null;
+        static public bool loadComments = false;
+        static public int POST_HEIGHT = 95;//times by count
 
         public Reddit()
         {
@@ -28,50 +30,71 @@ namespace BigBadBolts_Assign4
             SubbredditComboBox.SelectedIndex = 0;
         }
 
+        /**
+         * This function populates the subbreddit drop box with the ones from the file
+         * Note:The first one is hardcoded to be "Home" which is all the subreddits
+         */
         private void PopulateSubComboBox()
         {
-            SubbredditComboBox.Items.Add("Home");
-            foreach(Subreddit subreddit in mySubReddits)
+            SubbredditComboBox.Items.Add("Home");//Hardcode home into the dropdown
+            foreach(Subreddit subreddit in mySubReddits)//add all the rest of the subreddits except all
             {
                 if(subreddit.Name != "all")
                   SubbredditComboBox.Items.Add(subreddit.Name);
             }
         }
 
+        /**
+         * This function is used to clear the panel of all things in it
+         */
         private void ClearPanel()
         {
             mainPanel.Controls.Clear();
         }
 
+        /**
+         * This function is used to calculate how long ago something was posted
+         * It retuns a string of the timeframe it was posted ago
+         * it takes a date time parameter to use to determine the date ago
+         */
         private string TimeFrameAgo(DateTime obj)
-        {
-            //            Less than an hour old from NOW, in which we're measuring minutes since posting
-            //              Less than a day from NOW, in which we're measuring hours since posting
-            //              Less than a month from NOW, in which we're measuring days since posting
-            //              Less than a year from NOW, in which we're measuring months since posting
-            //              More than a year from NOW, in which we're measuring years since posting
-
+        { 
             int daysSincePost = 0;
+            //Calculate how many days have passed
             if (DateTime.Now.Month + 1 == obj.Month || DateTime.Now.Month == 12 && obj.Month == 1)
                 daysSincePost = DateTime.Now.Day + 30 - obj.Day;
             else
                 daysSincePost = DateTime.Now.Day - obj.Day;
-            if (DateTime.Now.Hour - obj.Hour < 1)//posted less than an hour ago
+
+
+            if (DateTime.Now.Hour - obj.Hour < 1 && daysSincePost== 0)//posted less than an hour ago
             {
-                return (DateTime.Now.Minute - obj.Minute).ToString();
+                return (DateTime.Now.Minute - obj.Minute).ToString() + " minutes";
             }
-            else if (DateTime.Now.Hour - obj.Hour < 24)//posted less than a day ago
+            else if (DateTime.Now.Hour - obj.Hour < 24 && daysSincePost == 0)//posted less than a day ago
             {
-                return (DateTime.Now.Hour - obj.Hour).ToString();
+                return (DateTime.Now.Hour - obj.Hour).ToString() +" hours";
             }
             else if (daysSincePost < 30)//posted less than a month
             {
-                return (DateTime.Now.Minute - obj.Minute).ToString();
+                return (daysSincePost.ToString() + " days");
             }
-
-            return "";
+            else if (daysSincePost > 30 && daysSincePost < 365)//less than a year ago
+            {
+                return (DateTime.Now.Month - obj.Month).ToString() + " months";
+            }
+            else //more than a year
+            {
+                return (DateTime.Now.Year - obj.Year).ToString() + " years";
+            }
         }
 
+        /**
+         * This monstrous function is used to load the post for a given subbreddit. 
+         * it also checks to see if a user is logged in, if they are, it loads the comments
+         * Parmeters: subbredditName is the name of the subbreddit to load the posts from. 
+         * Note the name "all" will load all of the posts
+         */
         private void LoadPosts(string subredditName)
         {
             ClearPanel();
@@ -90,14 +113,14 @@ namespace BigBadBolts_Assign4
                     int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
 
                     upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                     upVote.Width = 23;
                     upVote.Height = 23;
                     mainPanel.Controls.Add(upVote);
                     upGrey = true;
 
                     scoreLabel.Text = p.Score.ToString();
-                    scoreLabel.Location = new System.Drawing.Point(2, (70 * count) + 25);
+                    scoreLabel.Location = new System.Drawing.Point(2, (POST_HEIGHT * count) + 25);
                     scoreLabel.AutoSize = true;
                     mainPanel.Controls.Add(scoreLabel);
 
@@ -112,7 +135,7 @@ namespace BigBadBolts_Assign4
                             if (upGrey)
                             {
                                 upVote.Image = Image.FromFile("..//..//upVote_red.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -121,7 +144,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -132,7 +155,7 @@ namespace BigBadBolts_Assign4
                             else if (!downGrey)
                             {
                                 upVote.Image = Image.FromFile("..//..//upVote_red.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -141,7 +164,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -152,7 +175,7 @@ namespace BigBadBolts_Assign4
                             else //!upGrey
                             {
                                 upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -161,7 +184,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -172,7 +195,7 @@ namespace BigBadBolts_Assign4
                     }
 
                     downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                     downVote.Width = 23;
                     downVote.Height = 23;
                     mainPanel.Controls.Add(downVote);
@@ -187,7 +210,7 @@ namespace BigBadBolts_Assign4
                             if (downGrey)
                             {
                                 downVote.Image = Image.FromFile("..//..//downVote_blue.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -196,7 +219,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -207,7 +230,7 @@ namespace BigBadBolts_Assign4
                             else if (!upGrey)
                             {
                                 downVote.Image = Image.FromFile("..//..//downVote_blue.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -216,7 +239,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -227,7 +250,7 @@ namespace BigBadBolts_Assign4
                             else
                             {
                                 downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                 downVote.Width = 23;
                                 downVote.Height = 23;
                                 mainPanel.Controls.Add(downVote);
@@ -236,7 +259,7 @@ namespace BigBadBolts_Assign4
                                 scoreLabel.Text = score.ToString();
                                 mainPanel.Controls.Add(scoreLabel);
                                 upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                 upVote.Width = 23;
                                 upVote.Height = 23;
                                 mainPanel.Controls.Add(upVote);
@@ -246,24 +269,27 @@ namespace BigBadBolts_Assign4
                         }
                     }
 
-                    rtb.Location = new System.Drawing.Point(50, 70 * count);
+                    //the score and up and down arrows have been added
+
+
+                    rtb.Location = new System.Drawing.Point(50, POST_HEIGHT * count);
                     rtb.Size = new Size(920, 60);
                     rtb.Name = "txt_" + (count + 1);
 
                     //r / SUBREDDIT_HOME | Posted by u/ AUTHOR_NAME TIME_FRAME ago
                     rtb.Text = "r/";
-                    foreach(Subreddit sub in mySubReddits)
+                    foreach(Subreddit sub in mySubReddits)//Get the name of the subbreddit
                     {
-                        if(p.SubHome == sub.Id)
+                        if(p.SubHome == sub.Id)//got the sub name
                         {
                             rtb.Text += sub.Name;
                             break;
                         }
                     }
                     rtb.Text += " | Posted by u/";
-                    foreach (User user in myUsers)
+                    foreach (User user in myUsers)//get the user name
                     {
-                        if (p.PostAuthorId == user.Id)
+                        if (p.PostAuthorId == user.Id)//got the user
                         {
                             rtb.Text += user.Name;
                             break;
@@ -271,10 +297,224 @@ namespace BigBadBolts_Assign4
                     }
                     rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
 
-                    rtb.Text = p.PostContent;
+                    rtb.Text += p.PostContent;
 
-                    mainPanel.Controls.Add(rtb);
+                    mainPanel.Controls.Add(rtb);//add the rich text field to the panel
 
+                    ////////////////////////////////////////////////////////////////////////
+                    ///
+
+                    //Load COMMENTs
+
+                    ///////////////////////////////////////////////////////////////////
+                    if (loadComments)//checks to see if comments should be loaded, will load if user is logged in
+                    {
+                        foreach (Comment comment in myComments)//go through comments to load them
+                        {
+                            if (p.PostID == comment.ParentID)//found a comment belong to post 'p'
+                            {
+                                PictureBox commentUpVote = new PictureBox();
+                                PictureBox CommentdownVote = new PictureBox();
+                                PictureBox CommentReply = new PictureBox();
+
+                                Label Comment_scoreLabel = new Label();
+
+                                bool CommentupGrey = false;
+                                bool CommentdownGrey = false;
+
+                                int Commentcount = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+
+                                commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                commentUpVote.Width = 23;
+                                commentUpVote.Height = 23;
+                                mainPanel.Controls.Add(commentUpVote);
+                                CommentupGrey = true;
+
+                                Comment_scoreLabel.Text = comment.Score.ToString();
+                                Comment_scoreLabel.Location = new System.Drawing.Point(12, (POST_HEIGHT * Commentcount) + 25);
+                                Comment_scoreLabel.AutoSize = true;
+                                mainPanel.Controls.Add(Comment_scoreLabel);
+
+                                int CommentorigScore = Convert.ToInt32(Comment_scoreLabel.Text);
+
+                                commentUpVote.MouseDown += commentUpVote_MouseDown;
+
+                                void commentUpVote_MouseDown(object sender, MouseEventArgs e)
+                                {
+                                    if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                    {
+                                        if (CommentupGrey)
+                                        {
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                            commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            int Commentscore = CommentorigScore;
+                                            Commentscore++;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            CommentupGrey = false;
+                                            CommentdownGrey = true;
+                                        }
+
+                                        else if (!CommentdownGrey)
+                                        {
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                            commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                            Commentscore += 2;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            CommentupGrey = false;
+                                            CommentdownGrey = true;
+                                        }
+
+                                        else //!upGrey
+                                        {
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                            Commentscore--;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            CommentupGrey = true;
+                                            CommentdownGrey = true;
+                                        }
+                                    }
+                                }
+
+                                CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                CommentdownVote.Width = 23;
+                                CommentdownVote.Height = 23;
+                                mainPanel.Controls.Add(CommentdownVote);
+                                CommentdownGrey = true;
+
+                                CommentdownVote.MouseDown += CommentdownVote_MouseDown;
+
+                                void CommentdownVote_MouseDown(object sender, MouseEventArgs e)
+                                {
+                                    if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                    {
+                                        if (CommentdownGrey)
+                                        {
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            int Commentscore = CommentorigScore;
+                                            Commentscore--;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            CommentupGrey = true;
+                                            CommentdownGrey = false;
+                                        }
+
+                                        else if (!CommentupGrey)
+                                        {
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                            Commentscore -= 2;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * count);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            CommentupGrey = true;
+                                            CommentdownGrey = false;
+                                        }
+
+                                        else
+                                        {
+                                            CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                            CommentdownVote.Width = 23;
+                                            CommentdownVote.Height = 23;
+                                            mainPanel.Controls.Add(CommentdownVote);
+                                            int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                            Commentscore++;
+                                            Comment_scoreLabel.Text = Commentscore.ToString();
+                                            mainPanel.Controls.Add(Comment_scoreLabel);
+                                            commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                            commentUpVote.Width = 23;
+                                            commentUpVote.Height = 23;
+                                            mainPanel.Controls.Add(commentUpVote);
+                                            CommentupGrey = true;
+                                            CommentdownGrey = true;
+                                        }
+                                    }
+                                }
+
+                                //Score and arrows are added to the panel
+
+                                RichTextBox Comment_rtb = new RichTextBox();
+                                Comment_rtb.Location = new System.Drawing.Point(80, POST_HEIGHT * Commentcount);
+                                Comment_rtb.Size = new Size(890, 60);
+                                Comment_rtb.Name = "comment_txt_" + (Commentcount + 1);
+
+                                //AUTHOR_NAME | COMMENT_SCORE TIME_FRAME ago
+                                foreach (User user in myUsers)//search users for auhtor
+                                {
+                                    if (comment.CommentAuthorId == user.Id) //found user
+                                    {
+                                        Comment_rtb.Text = user.Name;
+                                        break;
+                                    }
+                                }
+                                Comment_rtb.Text += " | " + comment.Score.ToString();
+                                Comment_rtb.Text += " " + TimeFrameAgo(comment.TimeStamp) + " ago\n";
+
+
+                                Comment_rtb.Text += comment.Content;
+
+                                mainPanel.Controls.Add(Comment_rtb);
+
+                                //add reply button thing
+                                CommentReply.Image = Image.FromFile("../../reply_icon.png");
+                                CommentReply.Location = new System.Drawing.Point(80, (POST_HEIGHT * Commentcount)+64);
+                                CommentReply.Width = 67;
+                                CommentReply.Height = 26;
+
+                                mainPanel.Controls.Add(CommentReply);
+                            }//end if comment bleongs to parent
+                        }//end comment foreach loop
+                    }//end load comments
 
                 }
             }
@@ -291,33 +531,433 @@ namespace BigBadBolts_Assign4
                 }
 
                 bool empty = true;
-                foreach (Post p in myPosts)
+                foreach (Post p in myPosts)//go through posts to ouput them
                 {
-                    if (p.SubHome == selectedSub.Id)
+                    if (p.SubHome == selectedSub.Id)//found a post belonging to this subbreddit
                     {
-                        if(empty == true)
+                        if(empty == true)//we found one entry so its not empty
                         {
                             empty = false;
                         }
+
+                        PictureBox upVote = new PictureBox();
+                        PictureBox downVote = new PictureBox();
+                        Label scoreLabel = new Label();
                         RichTextBox rtb = new RichTextBox();
 
+                        bool upGrey = false;
+                        bool downGrey = false;
+
                         int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                        rtb.Location = new System.Drawing.Point(10, 70 * count);
-                        rtb.Size = new Size(935, 50);
+
+                        upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                        upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                        upVote.Width = 23;
+                        upVote.Height = 23;
+                        mainPanel.Controls.Add(upVote);
+                        upGrey = true;
+
+                        scoreLabel.Text = p.Score.ToString();
+                        scoreLabel.Location = new System.Drawing.Point(2, (POST_HEIGHT * count) + 25);
+                        scoreLabel.AutoSize = true;
+                        mainPanel.Controls.Add(scoreLabel);
+
+                        int origScore = Convert.ToInt32(scoreLabel.Text);
+
+                        upVote.MouseDown += upVote_MouseDown;
+
+                        void upVote_MouseDown(object sender, MouseEventArgs e)
+                        {
+                            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                            {
+                                if (upGrey)
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = origScore;
+                                    score++;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = false;
+                                    downGrey = true;
+                                }
+
+                                else if (!downGrey)
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score += 2;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = false;
+                                    downGrey = true;
+                                }
+
+                                else //!upGrey
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score--;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = true;
+                                    downGrey = true;
+                                }
+                            }
+                        }
+
+                        downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                        downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                        downVote.Width = 23;
+                        downVote.Height = 23;
+                        mainPanel.Controls.Add(downVote);
+                        downGrey = true;
+
+                        downVote.MouseDown += downVote_MouseDown;
+
+                        void downVote_MouseDown(object sender, MouseEventArgs e)
+                        {
+                            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                            {
+                                if (downGrey)
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = origScore;
+                                    score--;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = false;
+                                }
+
+                                else if (!upGrey)
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score -= 2;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = false;
+                                }
+
+                                else
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score++;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = true;
+                                }
+                            }
+                        }
+                        //Score and arrows added
+
+                        rtb.Location = new System.Drawing.Point(50, POST_HEIGHT * count);
+                        rtb.Size = new Size(920, 60);
                         rtb.Name = "txt_" + (count + 1);
 
-                        rtb.Text = p.ToString();
+                        //r / SUBREDDIT_HOME | Posted by u/ AUTHOR_NAME TIME_FRAME ago
+                        rtb.Text = "r/";
+                        foreach (Subreddit sub in mySubReddits)//search sub for name of sub
+                        {
+                            if (p.SubHome == sub.Id)//found the name
+                            {
+                                rtb.Text += sub.Name;
+                                break;
+                            }
+                        }
+                        rtb.Text += " | Posted by u/";
+                        foreach (User user in myUsers)//search user for author
+                        {
+                            if (p.PostAuthorId == user.Id)//found author
+                            {
+                                rtb.Text += user.Name;
+                                break;
+                            }
+                        }
+                        rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
+
+                        rtb.Text += p.PostContent;
 
                         mainPanel.Controls.Add(rtb);
 
+                        ////////////////////////////////////////////////////////////////////////
+                        ///
+
+                        //Load COMMENTs
+
+                        ///////////////////////////////////////////////////////////////////
+                        if (loadComments)//only do  this if user is logged in
+                        {
+                            foreach (Comment comment in myComments)//go through comments
+                            {
+                                if (p.PostID == comment.ParentID)//only load comment belonging to this post
+                                {
+                                    PictureBox commentUpVote = new PictureBox();
+                                    PictureBox CommentdownVote = new PictureBox();
+                                    PictureBox CommentReply = new PictureBox();
+
+                                    Label Comment_scoreLabel = new Label();
+
+                                    bool CommentupGrey = false;
+                                    bool CommentdownGrey = false;
+
+                                    int Commentcount = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+
+                                    commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                    commentUpVote.Width = 23;
+                                    commentUpVote.Height = 23;
+                                    mainPanel.Controls.Add(commentUpVote);
+                                    CommentupGrey = true;
+
+                                    Comment_scoreLabel.Text = comment.Score.ToString();
+                                    Comment_scoreLabel.Location = new System.Drawing.Point(12, (POST_HEIGHT * Commentcount) + 25);
+                                    Comment_scoreLabel.AutoSize = true;
+                                    mainPanel.Controls.Add(Comment_scoreLabel);
+
+                                    int CommentorigScore = Convert.ToInt32(Comment_scoreLabel.Text);
+
+                                    commentUpVote.MouseDown += commentUpVote_MouseDown;
+
+                                    void commentUpVote_MouseDown(object sender, MouseEventArgs e)
+                                    {
+                                        if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                        {
+                                            if (CommentupGrey)
+                                            {
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                                commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                int Commentscore = CommentorigScore;
+                                                Commentscore++;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                CommentupGrey = false;
+                                                CommentdownGrey = true;
+                                            }
+
+                                            else if (!CommentdownGrey)
+                                            {
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                                commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                                Commentscore += 2;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                CommentupGrey = false;
+                                                CommentdownGrey = true;
+                                            }
+
+                                            else //!upGrey
+                                            {
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                                commentUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * Commentcount);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                                Commentscore--;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                CommentupGrey = true;
+                                                CommentdownGrey = true;
+                                            }
+                                        }
+                                    }
+
+                                    CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                    CommentdownVote.Width = 23;
+                                    CommentdownVote.Height = 23;
+                                    mainPanel.Controls.Add(CommentdownVote);
+                                    CommentdownGrey = true;
+
+                                    CommentdownVote.MouseDown += CommentdownVote_MouseDown;
+
+                                    void CommentdownVote_MouseDown(object sender, MouseEventArgs e)
+                                    {
+                                        if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                        {
+                                            if (CommentdownGrey)
+                                            {
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                int Commentscore = CommentorigScore;
+                                                Commentscore--;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                                commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                CommentupGrey = true;
+                                                CommentdownGrey = false;
+                                            }
+
+                                            else if (!CommentupGrey)
+                                            {
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                                Commentscore -= 2;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                                commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * count);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                CommentupGrey = true;
+                                                CommentdownGrey = false;
+                                            }
+
+                                            else
+                                            {
+                                                CommentdownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                                CommentdownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * Commentcount) + 40);
+                                                CommentdownVote.Width = 23;
+                                                CommentdownVote.Height = 23;
+                                                mainPanel.Controls.Add(CommentdownVote);
+                                                int Commentscore = Convert.ToInt32(Comment_scoreLabel.Text);
+                                                Commentscore++;
+                                                Comment_scoreLabel.Text = Commentscore.ToString();
+                                                mainPanel.Controls.Add(Comment_scoreLabel);
+                                                commentUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                                commentUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * Commentcount);
+                                                commentUpVote.Width = 23;
+                                                commentUpVote.Height = 23;
+                                                mainPanel.Controls.Add(commentUpVote);
+                                                CommentupGrey = true;
+                                                CommentdownGrey = true;
+                                            }
+                                        }
+                                    }
+
+                                    RichTextBox Comment_rtb = new RichTextBox();
+                                    Comment_rtb.Location = new System.Drawing.Point(80, POST_HEIGHT * Commentcount);
+                                    Comment_rtb.Size = new Size(890, 60);
+                                    Comment_rtb.Name = "comment_txt_" + (Commentcount + 1);
+
+                                    //AUTHOR_NAME | COMMENT_SCORE TIME_FRAME ago
+                                    foreach (User user in myUsers)
+                                    {
+                                        if (comment.CommentAuthorId == user.Id)
+                                        {
+                                            Comment_rtb.Text = user.Name;
+                                            break;
+                                        }
+                                    }
+                                    Comment_rtb.Text += " | " + comment.Score.ToString();
+                                    Comment_rtb.Text += " " + TimeFrameAgo(comment.TimeStamp) + " ago\n";
+
+
+                                    Comment_rtb.Text += comment.Content;
+
+                                    mainPanel.Controls.Add(Comment_rtb);
+
+                                    CommentReply.Image = Image.FromFile("../../reply_icon.png");
+                                    CommentReply.Location = new System.Drawing.Point(80, (POST_HEIGHT * Commentcount) + 64);
+                                    CommentReply.Width = 67;
+                                    CommentReply.Height = 26;
+
+                                    mainPanel.Controls.Add(CommentReply);
+                                }//end if comment bleongs to parent
+                            }//end comment foreach loop
+                        }//end load comments
+
+
                     }
                 }
-                if(empty == true)
+                if(empty == true)//did not find a post to display for the subbreddit
                 {
                     RichTextBox rtb = new RichTextBox();
 
                     int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                    rtb.Location = new System.Drawing.Point(10, 70 * count);
+                    rtb.Location = new System.Drawing.Point(10, POST_HEIGHT * count);
                     rtb.Size = new Size(935, 50);
                     rtb.Name = "txt_" + (count + 1);
 
@@ -333,6 +973,9 @@ namespace BigBadBolts_Assign4
 
         }
 
+        /**
+         * This function handles the log in for a user and will be th elogout button too
+         */
         private void LoginBtn_Click(object sender, EventArgs e)
         {
 
@@ -340,7 +983,7 @@ namespace BigBadBolts_Assign4
 
             if (login.Text == "Login") //this is to login
             {
-                Form2 f = new Form2();
+                Form2 f = new Form2();//launch form to handle the log in
                 var result = f.ShowDialog();
                 if (result == DialogResult.Cancel)//we did not log in
                 {
@@ -352,6 +995,16 @@ namespace BigBadBolts_Assign4
                     currentUser = f.loggedInUser; //Get the user from the login form
                     login.AutoSize = true;
                     login.Text = "Logout from " + currentUser.Name;
+                    loadComments = true;
+
+                    if (SubbredditComboBox.SelectedIndex == 0)//this is all
+                    {
+                        LoadPosts("all");
+                    }
+                    else //load the individual subbreddits
+                    {
+                        LoadPosts(SubbredditComboBox.SelectedItem.ToString());
+                    }
 
                 }
      
@@ -361,9 +1014,22 @@ namespace BigBadBolts_Assign4
                 ////Reset everything to a logged out state
                 loginBtn.Text = "Login";
                 currentUser = null;
+                loadComments = false;
+                if (SubbredditComboBox.SelectedIndex == 0)//this is all
+                {
+                    LoadPosts("all");
+                }
+                else //load the individual subbreddits
+                {
+                    LoadPosts(SubbredditComboBox.SelectedItem.ToString());
+                }
             }
         }
 
+
+        /**
+         * This function is to tell when the selected subbreddit to view changes
+         */
         private void SubbredditComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(SubbredditComboBox.SelectedIndex == 0)//this is all
@@ -375,6 +1041,7 @@ namespace BigBadBolts_Assign4
                 LoadPosts(SubbredditComboBox.SelectedItem.ToString());
             }
         }
+
         private void SearchTextBox_Click(object sender, EventArgs e)
         {
             if(searchTextBox.Text == "Search")
@@ -407,7 +1074,10 @@ namespace BigBadBolts_Assign4
         {
             ClearPanel();
            // MessageBox.Show(inputText);
-
+           ////////////////////////////////////////////////////////////////////////////////
+           //NOTE TO PARTNER HERE
+           //I changed a lot of code for loading a post. idk if this will continue to work now but it should
+           //please update it with the code in the current load posts so it formats the things correctly
             if (subredditName == "all") // load all the post
             {
                 foreach (Post p in myPosts)
@@ -425,14 +1095,14 @@ namespace BigBadBolts_Assign4
                         int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
 
                         upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                        upVote.Location = new System.Drawing.Point(5, 70 * count);
+                        upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                         upVote.Width = 23;
                         upVote.Height = 23;
                         mainPanel.Controls.Add(upVote);
                         upGrey = true;
 
                         scoreLabel.Text = p.Score.ToString();
-                        scoreLabel.Location = new System.Drawing.Point(2, (70 * count) + 25);
+                        scoreLabel.Location = new System.Drawing.Point(2, (POST_HEIGHT * count) + 25);
                         scoreLabel.AutoSize = true;
                         mainPanel.Controls.Add(scoreLabel);
 
@@ -447,7 +1117,7 @@ namespace BigBadBolts_Assign4
                                 if (upGrey)
                                 {
                                     upVote.Image = Image.FromFile("..//..//upVote_red.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -456,7 +1126,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -467,7 +1137,7 @@ namespace BigBadBolts_Assign4
                                 else if (!downGrey)
                                 {
                                     upVote.Image = Image.FromFile("..//..//upVote_red.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -476,7 +1146,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -487,7 +1157,7 @@ namespace BigBadBolts_Assign4
                                 else //!upGrey
                                 {
                                     upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -496,7 +1166,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -507,7 +1177,7 @@ namespace BigBadBolts_Assign4
                         }
 
                         downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                        downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                        downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                         downVote.Width = 23;
                         downVote.Height = 23;
                         mainPanel.Controls.Add(downVote);
@@ -522,7 +1192,7 @@ namespace BigBadBolts_Assign4
                                 if (downGrey)
                                 {
                                     downVote.Image = Image.FromFile("..//..//downVote_blue.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -531,7 +1201,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -542,7 +1212,7 @@ namespace BigBadBolts_Assign4
                                 else if (!upGrey)
                                 {
                                     downVote.Image = Image.FromFile("..//..//downVote_blue.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -551,7 +1221,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -562,7 +1232,7 @@ namespace BigBadBolts_Assign4
                                 else
                                 {
                                     downVote.Image = Image.FromFile("..//..//downVote_grey.png");
-                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * count) + 40);
                                     downVote.Width = 23;
                                     downVote.Height = 23;
                                     mainPanel.Controls.Add(downVote);
@@ -571,7 +1241,7 @@ namespace BigBadBolts_Assign4
                                     scoreLabel.Text = score.ToString();
                                     mainPanel.Controls.Add(scoreLabel);
                                     upVote.Image = Image.FromFile("..//..//upVote_grey.png");
-                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Location = new System.Drawing.Point(5, POST_HEIGHT * count);
                                     upVote.Width = 23;
                                     upVote.Height = 23;
                                     mainPanel.Controls.Add(upVote);
@@ -581,7 +1251,7 @@ namespace BigBadBolts_Assign4
                             }
                         }
 
-                        rtb.Location = new System.Drawing.Point(50, 70 * count);
+                        rtb.Location = new System.Drawing.Point(50, POST_HEIGHT * count);
                         rtb.Size = new Size(920, 60);
                         rtb.Name = "txt_" + (count + 1);
                         
@@ -656,7 +1326,7 @@ namespace BigBadBolts_Assign4
                             RichTextBox rtb = new RichTextBox();
 
                             int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                            rtb.Location = new System.Drawing.Point(10, 70 * count);
+                            rtb.Location = new System.Drawing.Point(10, POST_HEIGHT * count);
                             rtb.Size = new Size(935, 50);
                             rtb.Name = "txt_" + (count + 1);
 

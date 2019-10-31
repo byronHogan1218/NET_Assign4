@@ -55,7 +55,7 @@ namespace BigBadBolts_Assign4
         {
             get { return downVotes; }
         }
-        public DateTime time
+        public DateTime TimeStamp
         {
             get { return timeStamp; }
         }
