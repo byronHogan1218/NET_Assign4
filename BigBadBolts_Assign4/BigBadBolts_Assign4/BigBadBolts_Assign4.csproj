@@ -83,6 +83,9 @@
     <Compile Include="Assign2_ref\User.cs" />
     <Compile Include="Subreddit.cs" />
     <Compile Include="User.cs" />
+    <EmbeddedResource Include="Assign3_ref\RedditQueries.resx">
+      <DependentUpon>RedditQueries.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

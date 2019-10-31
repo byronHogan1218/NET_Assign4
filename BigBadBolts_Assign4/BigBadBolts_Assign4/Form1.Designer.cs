@@ -34,13 +34,14 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.SubbredditComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.searchTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // loginBtn
             // 
             this.loginBtn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.loginBtn.Location = new System.Drawing.Point(825, 32);
+            this.loginBtn.Location = new System.Drawing.Point(874, 30);
             this.loginBtn.Margin = new System.Windows.Forms.Padding(4);
             this.loginBtn.Name = "loginBtn";
             this.loginBtn.Size = new System.Drawing.Size(149, 28);
@@ -70,9 +71,9 @@
             // SubbredditComboBox
             // 
             this.SubbredditComboBox.FormattingEnabled = true;
-            this.SubbredditComboBox.Location = new System.Drawing.Point(351, 32);
+            this.SubbredditComboBox.Location = new System.Drawing.Point(371, 32);
             this.SubbredditComboBox.Name = "SubbredditComboBox";
-            this.SubbredditComboBox.Size = new System.Drawing.Size(220, 24);
+            this.SubbredditComboBox.Size = new System.Drawing.Size(200, 28);
             this.SubbredditComboBox.TabIndex = 3;
             this.SubbredditComboBox.SelectedIndexChanged += new System.EventHandler(this.SubbredditComboBox_SelectedIndexChanged);
             // 
@@ -82,16 +83,29 @@
             this.label1.Font = new System.Drawing.Font("Source Code Pro", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(180, 30);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(155, 26);
+            this.label1.Size = new System.Drawing.Size(191, 34);
             this.label1.TabIndex = 4;
             this.label1.Text = "Subbreddit:";
             // 
+            // searchTextBox
+            // 
+            this.searchTextBox.ForeColor = System.Drawing.Color.DimGray;
+            this.searchTextBox.Location = new System.Drawing.Point(597, 30);
+            this.searchTextBox.Name = "searchTextBox";
+            this.searchTextBox.Size = new System.Drawing.Size(257, 28);
+            this.searchTextBox.TabIndex = 5;
+            this.searchTextBox.Text = "Search";
+            this.searchTextBox.Click += new System.EventHandler(this.SearchTextBox_Click);
+            this.searchTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchTextBox_KeyDown);
+            this.searchTextBox.Leave += new System.EventHandler(this.SearchTextBox_Leave);
+            // 
             // Reddit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.ClientSize = new System.Drawing.Size(1153, 554);
+            this.Controls.Add(this.searchTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.SubbredditComboBox);
             this.Controls.Add(this.pictureBox1);
@@ -116,6 +130,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ComboBox SubbredditComboBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox searchTextBox;
     }
 }
 
