@@ -56,20 +56,30 @@ namespace BigBadBolts_Assign4
                 daysSincePost = DateTime.Now.Day + 30 - obj.Day;
             else
                 daysSincePost = DateTime.Now.Day - obj.Day;
-            if (DateTime.Now.Hour - obj.Hour < 1)//posted less than an hour ago
+
+
+            if (DateTime.Now.Hour - obj.Hour < 1 && daysSincePost== 0)//posted less than an hour ago
             {
-                return (DateTime.Now.Minute - obj.Minute).ToString();
+                return (DateTime.Now.Minute - obj.Minute).ToString() + " minutes";
             }
-            else if (DateTime.Now.Hour - obj.Hour < 24)//posted less than a day ago
+            else if (DateTime.Now.Hour - obj.Hour < 24 && daysSincePost == 0)//posted less than a day ago
             {
-                return (DateTime.Now.Hour - obj.Hour).ToString();
+                return (DateTime.Now.Hour - obj.Hour).ToString() +" hours";
             }
             else if (daysSincePost < 30)//posted less than a month
             {
-                return (DateTime.Now.Minute - obj.Minute).ToString();
+                return (daysSincePost.ToString() + " days");
+            }
+            else if (daysSincePost > 30 && daysSincePost < 365)//less than a year ago
+            {
+                return (DateTime.Now.Month - obj.Month).ToString() + " months";
+            }
+            else //more than a year
+            {
+                return (DateTime.Now.Year - obj.Year).ToString() + " years";
             }
 
-            return "";
+            //return "";
         }
 
         private void LoadPosts(string subredditName)
@@ -271,7 +281,7 @@ namespace BigBadBolts_Assign4
                     }
                     rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
 
-                    rtb.Text = p.PostContent;
+                    rtb.Text += p.PostContent;
 
                     mainPanel.Controls.Add(rtb);
 
@@ -299,16 +309,203 @@ namespace BigBadBolts_Assign4
                         {
                             empty = false;
                         }
+                        PictureBox upVote = new PictureBox();
+                        PictureBox downVote = new PictureBox();
+                        Label scoreLabel = new Label();
                         RichTextBox rtb = new RichTextBox();
 
+                        bool upGrey = false;
+                        bool downGrey = false;
+
                         int count = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
-                        rtb.Location = new System.Drawing.Point(10, 70 * count);
-                        rtb.Size = new Size(935, 50);
+
+                        upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                        upVote.Location = new System.Drawing.Point(5, 70 * count);
+                        upVote.Width = 23;
+                        upVote.Height = 23;
+                        mainPanel.Controls.Add(upVote);
+                        upGrey = true;
+
+                        scoreLabel.Text = p.Score.ToString();
+                        scoreLabel.Location = new System.Drawing.Point(2, (70 * count) + 25);
+                        scoreLabel.AutoSize = true;
+                        mainPanel.Controls.Add(scoreLabel);
+
+                        int origScore = Convert.ToInt32(scoreLabel.Text);
+
+                        upVote.MouseDown += upVote_MouseDown;
+
+                        void upVote_MouseDown(object sender, MouseEventArgs e)
+                        {
+                            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                            {
+                                if (upGrey)
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = origScore;
+                                    score++;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = false;
+                                    downGrey = true;
+                                }
+
+                                else if (!downGrey)
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score += 2;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = false;
+                                    downGrey = true;
+                                }
+
+                                else //!upGrey
+                                {
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score--;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    upGrey = true;
+                                    downGrey = true;
+                                }
+                            }
+                        }
+
+                        downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                        downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                        downVote.Width = 23;
+                        downVote.Height = 23;
+                        mainPanel.Controls.Add(downVote);
+                        downGrey = true;
+
+                        downVote.MouseDown += downVote_MouseDown;
+
+                        void downVote_MouseDown(object sender, MouseEventArgs e)
+                        {
+                            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                            {
+                                if (downGrey)
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = origScore;
+                                    score--;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = false;
+                                }
+
+                                else if (!upGrey)
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score -= 2;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = false;
+                                }
+
+                                else
+                                {
+                                    downVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                    downVote.Location = new System.Drawing.Point(5, (70 * count) + 40);
+                                    downVote.Width = 23;
+                                    downVote.Height = 23;
+                                    mainPanel.Controls.Add(downVote);
+                                    int score = Convert.ToInt32(scoreLabel.Text);
+                                    score++;
+                                    scoreLabel.Text = score.ToString();
+                                    mainPanel.Controls.Add(scoreLabel);
+                                    upVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                    upVote.Location = new System.Drawing.Point(5, 70 * count);
+                                    upVote.Width = 23;
+                                    upVote.Height = 23;
+                                    mainPanel.Controls.Add(upVote);
+                                    upGrey = true;
+                                    downGrey = true;
+                                }
+                            }
+                        }
+
+                        rtb.Location = new System.Drawing.Point(50, 70 * count);
+                        rtb.Size = new Size(920, 60);
                         rtb.Name = "txt_" + (count + 1);
 
-                        rtb.Text = p.ToString();
+                        //r / SUBREDDIT_HOME | Posted by u/ AUTHOR_NAME TIME_FRAME ago
+                        rtb.Text = "r/";
+                        foreach (Subreddit sub in mySubReddits)
+                        {
+                            if (p.SubHome == sub.Id)
+                            {
+                                rtb.Text += sub.Name;
+                                break;
+                            }
+                        }
+                        rtb.Text += " | Posted by u/";
+                        foreach (User user in myUsers)
+                        {
+                            if (p.PostAuthorId == user.Id)
+                            {
+                                rtb.Text += user.Name;
+                                break;
+                            }
+                        }
+                        rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
+
+                        rtb.Text += p.PostContent;
 
                         mainPanel.Controls.Add(rtb);
+
+
 
                     }
                 }
