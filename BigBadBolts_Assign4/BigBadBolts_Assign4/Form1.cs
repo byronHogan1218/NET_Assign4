@@ -1077,7 +1077,7 @@ namespace BigBadBolts_Assign4
            ////////////////////////////////////////////////////////////////////////////////
            //NOTE TO PARTNER HERE
            //I changed a lot of code for loading a post. idk if this will continue to work now but it should
-           //please update it with the code in the current load posts so it formats the things correctly
+           //please update it with the code in the current load posts so it formats the things correctly.
             if (subredditName == "all") // load all the post
             {
                 foreach (Post p in myPosts)
