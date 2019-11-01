@@ -83,9 +83,9 @@
             this.label1.Font = new System.Drawing.Font("Source Code Pro", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(180, 30);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(191, 34);
+            this.label1.Size = new System.Drawing.Size(175, 34);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Subbreddit:";
+            this.label1.Text = "Subreddit:";
             // 
             // searchTextBox
             // 

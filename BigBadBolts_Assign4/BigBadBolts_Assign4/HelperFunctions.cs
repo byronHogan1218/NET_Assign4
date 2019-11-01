@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 ///*******************************************************************
 //*                                                                  *
-//*  CSCI 473-1/504-1       Assignment 3                Fall   2019  *
+//*  CSCI 473-1/504-1       Assignment 4                Fall   2019  *
 //*                                                                  *
 //*                                                                  *
 //*  Program Name:  Reddit                                           *

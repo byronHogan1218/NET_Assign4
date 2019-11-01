@@ -10,10 +10,10 @@ using System.Windows.Forms;
 
 ///*******************************************************************
 //*                                                                  *
-//*  CSCI 473-1/504-1       Assignment 2                Fall   2019  *
+//*  CSCI 473-1/504-1       Assignment 4                Fall   2019  *
 //*                                                                  *
 //*                                                                  *
-//*  Program Name:  Reddit                                           *
+//*  Program Name:  Form2                                            *
 //*                                                                  *
 //*  Programmer:    Byron Hogan,  z1825194                           *
 //*                 Margaret Higginbotham, z1793581                  *

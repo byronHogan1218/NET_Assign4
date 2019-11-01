@@ -9,6 +9,20 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
+///*******************************************************************
+//*                                                                  *
+//*  CSCI 473-1/504-1       Assignment 4                Fall   2019  *
+//*                                                                  *
+//*                                                                  *
+//*  Program Name:  Reddit                                           *
+//*                                                                  *
+//*  Programmer:    Byron Hogan,  z1825194                           *
+//*                 Margaret Higginbotham, z1793581                  *
+//*                                                                  *
+//*******************************************************************/
+/*
+ * holds the main bulk of the program, posts, subreddits, search, comments, etc
+ */
 namespace BigBadBolts_Assign4
 {
     public partial class Reddit : Form
@@ -19,6 +33,7 @@ namespace BigBadBolts_Assign4
         static public SortedSet<User> myUsers = new SortedSet<User>();
         static public User currentUser = null;
         static public bool loadComments = false;
+        static public bool loadReplies = false;
         static public int POST_HEIGHT = 95;//times by count
 
         public Reddit()
@@ -300,6 +315,214 @@ namespace BigBadBolts_Assign4
                     rtb.Text += p.PostContent;
 
                     mainPanel.Controls.Add(rtb);//add the rich text field to the panel
+
+                    ////////////////////////////////////////////////////////////////////////
+                    ///
+
+                    //Load REPLIES
+
+                    ///////////////////////////////////////////////////////////////////
+
+                    if (loadReplies) //checks to see if they can be loaded
+                    {
+                        foreach(Comment reply in myComments)
+                        {
+                            if (p.PostID == reply.ParentID)
+                            {
+                                PictureBox replyUpVote = new PictureBox();
+                                PictureBox replyDownVote = new PictureBox();
+                                PictureBox replyReply = new PictureBox();
+
+                                Label replyScoreLabel = new Label();
+
+                                bool replyUpGrey = false;
+                                bool replyDownGrey = false;
+                                
+                                int replyCount = mainPanel.Controls.OfType<RichTextBox>().ToList().Count;
+                                //the next chunk is for the up and down votes and the score
+                                replyUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                replyUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * replyCount);
+                                replyUpVote.Width = 23;
+                                replyUpVote.Height = 23;
+                                mainPanel.Controls.Add(replyUpVote);
+                                replyUpGrey = true;
+
+                                replyScoreLabel.Text = reply.Score.ToString();
+                                replyScoreLabel.Location = new System.Drawing.Point(12, (POST_HEIGHT * replyCount) + 25);
+                                replyScoreLabel.AutoSize = true;
+                                mainPanel.Controls.Add(replyScoreLabel);
+
+                                int CommentorigScore = Convert.ToInt32(replyScoreLabel.Text);
+
+                                replyUpVote.MouseDown += ReplyUpVote_MouseDown;
+                                //these are the conditions on what the color should be depending on its previous state
+                                void ReplyUpVote_MouseDown(object sender, MouseEventArgs e)
+                                {
+                                    if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                    {
+                                        if (replyUpGrey)
+                                        {
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                            replyUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * replyCount);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            int replyScore = CommentorigScore;
+                                            replyScore++;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            replyDownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            replyUpGrey = false;
+                                            replyDownGrey = true;
+                                        }
+
+                                        else if (!replyDownGrey)
+                                        {
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_red.png");
+                                            replyUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * replyCount);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            int replyScore = Convert.ToInt32(replyScoreLabel.Text);
+                                            replyScore += 2;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            replyDownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            replyUpGrey = false;
+                                            replyDownGrey = true;
+                                        }
+
+                                        else //!upGrey
+                                        {
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            replyUpVote.Location = new System.Drawing.Point(5, POST_HEIGHT * replyCount);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            int replyScore = Convert.ToInt32(replyScoreLabel.Text);
+                                            replyScore--;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            replyDownVote.Location = new System.Drawing.Point(5, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            replyUpGrey = true;
+                                            replyDownGrey = true;
+                                        }
+                                    }
+                                }
+                                //down grey arrow
+                                replyDownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                replyDownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * replyCount) + 40);
+                                replyDownVote.Width = 23;
+                                replyDownVote.Height = 23;
+                                mainPanel.Controls.Add(replyDownVote);
+                                replyDownGrey = true;
+
+                                replyDownVote.MouseDown += ReplyDownVote_MouseDown;
+                                
+                                void ReplyDownVote_MouseDown(object sender, MouseEventArgs e)
+                                {
+                                    if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+                                    {
+                                        if (replyDownGrey)
+                                        {
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                            replyDownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            int replyScore = CommentorigScore;
+                                            replyScore--;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            replyUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * replyCount);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            replyUpGrey = true;
+                                            replyDownGrey = false;
+                                        }
+
+                                        else if (!replyUpGrey)
+                                        {
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_blue.png");
+                                            replyDownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            int replyScore = Convert.ToInt32(replyScoreLabel.Text);
+                                            replyScore -= 2;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            replyUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * count);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            replyUpGrey = true;
+                                            replyDownGrey = false;
+                                        }
+
+                                        else
+                                        {
+                                            replyDownVote.Image = Image.FromFile("..//..//downVote_grey.png");
+                                            replyDownVote.Location = new System.Drawing.Point(15, (POST_HEIGHT * replyCount) + 40);
+                                            replyDownVote.Width = 23;
+                                            replyDownVote.Height = 23;
+                                            mainPanel.Controls.Add(replyDownVote);
+                                            int replyScore = Convert.ToInt32(replyScoreLabel.Text);
+                                            replyScore++;
+                                            replyScoreLabel.Text = replyScore.ToString();
+                                            mainPanel.Controls.Add(replyScoreLabel);
+                                            replyUpVote.Image = Image.FromFile("..//..//upVote_grey.png");
+                                            replyUpVote.Location = new System.Drawing.Point(15, POST_HEIGHT * replyCount);
+                                            replyUpVote.Width = 23;
+                                            replyUpVote.Height = 23;
+                                            mainPanel.Controls.Add(replyUpVote);
+                                            replyUpGrey = true;
+                                            replyDownGrey = true;
+                                        }
+                                    }
+                                }
+
+                                //Score and arrows are added to the panel
+
+                                RichTextBox Reply_rtb = new RichTextBox();
+                                Reply_rtb.Location = new System.Drawing.Point(80, POST_HEIGHT * replyCount);
+                                Reply_rtb.Size = new Size(890, 60);
+                                Reply_rtb.Name = "comment_txt_" + (replyCount + 1);
+
+                                //AUTHOR_NAME | COMMENT_SCORE TIME_FRAME ago
+                                foreach (User user in myUsers)//search users for auhtor
+                                {
+                                    if (reply.CommentAuthorId == user.Id) //found user
+                                    {
+                                        Reply_rtb.Text = user.Name;
+                                        break;
+                                    }
+                                }
+                                Reply_rtb.Text += " | " + reply.Score.ToString();
+                                Reply_rtb.Text += " " + TimeFrameAgo(reply.TimeStamp) + " ago\n";
+
+
+                                Reply_rtb.Text += reply.Content;
+
+                                mainPanel.Controls.Add(Reply_rtb);
+                            }
+                        }
+                    }
 
                     ////////////////////////////////////////////////////////////////////////
                     ///
@@ -939,12 +1162,6 @@ namespace BigBadBolts_Assign4
 
                                     mainPanel.Controls.Add(Comment_rtb);
 
-                                    CommentReply.Image = Image.FromFile("../../reply_icon.png");
-                                    CommentReply.Location = new System.Drawing.Point(80, (POST_HEIGHT * Commentcount) + 64);
-                                    CommentReply.Width = 67;
-                                    CommentReply.Height = 26;
-
-                                    mainPanel.Controls.Add(CommentReply);
                                 }//end if comment bleongs to parent
                             }//end comment foreach loop
                         }//end load comments
@@ -973,9 +1190,41 @@ namespace BigBadBolts_Assign4
 
         }
 
+        //mouse click event for comment replies
+        public void CommentReply_MouseClick(object sender, EventArgs e)
+        {
+            if (loggedIn)
+            {
+                mainPanel.Height = 150;
+            }
+        }
+
+        public Comment comment;
+        RichTextBox Reply_rtb = new RichTextBox();
+        
+        //mouse click events to submit a reply
+        public void ReplyButton_MouseClick(object sender, EventArgs e)
+        {
+            string commentReply = Reply_rtb.Text;
+            Comment newReply = new Comment(commentReply, currentUser.Id, comment.CommentID);
+            //mainPanel.Controls.Add(newReply, newReply.CommentID, newReply);
+            Reply_rtb.Text = "";
+            mainPanel.Height = Height;
+
+        }
+        
+        //mouse click event for cancelling making a reply
+        public void CancelReply_MouseClick(object sender, EventArgs e)
+        {
+            //replyBox.Text = "";
+        }
+
         /**
          * This function handles the log in for a user and will be th elogout button too
          */
+
+        bool loggedIn = false;
+
         private void LoginBtn_Click(object sender, EventArgs e)
         {
 
@@ -987,11 +1236,13 @@ namespace BigBadBolts_Assign4
                 var result = f.ShowDialog();
                 if (result == DialogResult.Cancel)//we did not log in
                 {
+                    loggedIn = false;
                     //do nothing
                     return;
                 }
                 if (result == DialogResult.OK) //We succesfully logged in
                 {
+                    loggedIn = true;
                     currentUser = f.loggedInUser; //Get the user from the login form
                     login.AutoSize = true;
                     login.Text = "Logout from " + currentUser.Name;
@@ -1042,6 +1293,10 @@ namespace BigBadBolts_Assign4
             }
         }
 
+        private void CommentReplyButton_Click(object sender, EventArgs e)
+        {
+
+        }
         private void SearchTextBox_Click(object sender, EventArgs e)
         {
             if(searchTextBox.Text == "Search")
@@ -1069,7 +1324,7 @@ namespace BigBadBolts_Assign4
             }
 
         }
-
+        //this section adds the up down arrows to the search results
         private void LoadPostsSearch(string subredditName, string inputText)
         {
             ClearPanel();
@@ -1254,41 +1509,31 @@ namespace BigBadBolts_Assign4
                         rtb.Location = new System.Drawing.Point(50, POST_HEIGHT * count);
                         rtb.Size = new Size(920, 60);
                         rtb.Name = "txt_" + (count + 1);
-                        
+
                         //r / SUBREDDIT_HOME | Posted by u/ AUTHOR_NAME TIME_FRAME ago
                         rtb.Text = "r/";
-                        foreach (Subreddit sub in mySubReddits)
+                        foreach (Subreddit sub in mySubReddits)//Get the name of the subbreddit
                         {
-                            if (p.ToString().Contains(inputText))
+                            if (p.SubHome == sub.Id)//got the sub name
                             {
-                                if (p.SubHome == sub.Id)
-                                {
-                                    rtb.Text += sub.Name;
-                                    break;
-                                }
+                                rtb.Text += sub.Name;
+                                break;
                             }
-
                         }
-
                         rtb.Text += " | Posted by u/";
-                        foreach (User user in myUsers)
+                        foreach (User user in myUsers)//get the user name
                         {
-                            if (p.ToString().Contains(inputText))
+                            if (p.PostAuthorId == user.Id)//got the user
                             {
-                                if (p.PostAuthorId == user.Id)
-                                {
-                                    rtb.Text += user.Name;
-                                    break;
-                                }
+                                rtb.Text += user.Name;
+                                break;
                             }
-
                         }
-
                         rtb.Text += " " + TimeFrameAgo(p.TimeStamp) + " ago\n";
 
-                        rtb.Text = p.PostContent;
+                        rtb.Text += p.PostContent;
 
-                        mainPanel.Controls.Add(rtb);
+                        mainPanel.Controls.Add(rtb);//add the rich text field to the panel
 
                     }
                 }
